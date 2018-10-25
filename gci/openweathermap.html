@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <!--
 note: use it like this:
 openweathermap.html?key=[api key here]
@@ -175,7 +176,7 @@ openweathermap.html?key=[api key here]
 			var arg = "q="+arg1;
 		
 		$.ajax({
-		  	url: "http://api.openweathermap.org/data/2.5/weather?"+arg+"&APPID="+key+"&units=metric",
+		  	url: "https://api.openweathermap.org/data/2.5/weather?"+arg+"&APPID="+key+"&units=metric",
 		  	dataType: "json",
 		  	success: function(data){
 		  		$("#temp").text(data.main.temp);
