@@ -91,7 +91,7 @@ openweathermap.html?key=[api key here]
 
 <div class="col-md-6 offset-md-3">
 	<div class="col-md-4 offset-md-4" style="padding-top: 10px;">
-		<div class="row" id="iprow" style="display:inline;">IP geolocation <span class="dot yellow align-middle"></span> <i style="cursor:pointer;display:none;" onclick="tryIP()" class="fa fa-refresh"></i></div><br>
+		<div class="row" id="iprow" style="display:inline;">IP geolocation <span class="dotyellow align-middle"></span> <i style="cursor:pointer;display:none;" onclick="tryIP(undefined))" class="fa fa-refresh"></i></div><br>
 		<div class="row" id="gpsrow" style="display:inline;">GPS <span class="dot muted align-middle"></span> <i style="cursor:pointer;display:none;" onclick="tryGPS()" class="fa fa-refresh"></i></div><br>
 		<div class="row" id="custominputrow" style="display:inline;">Custom input <span class="dot muted align-middle"></span></div>
 	</div>
@@ -142,6 +142,7 @@ openweathermap.html?key=[api key here]
 </div>
 <script>
 	var key = "";
+	var gpsloaded = false;
 	function findGetParameter(parameterName) {
 	    var result = null,
 	        tmp = [];
@@ -169,7 +170,7 @@ openweathermap.html?key=[api key here]
 			setstatus(gpsrow, "red");
 		});
 	}
-	function loadweather(elm, arg1, arg2){
+	function loadweather(elm, arg1, arg2, start){
 		if(typeof(arg2) !== "undefined")
 			var arg = "lat="+parseFloat(arg1).toFixed(4)+"&lon="+parseFloat(arg2).toFixed(4);
 		else
@@ -179,6 +180,11 @@ openweathermap.html?key=[api key here]
 		  	url: "https://api.openweathermap.org/data/2.5/weather?"+arg+"&APPID="+key+"&units=metric",
 		  	dataType: "json",
 		  	success: function(data){
+				if(typeof(start) !== 
+"undefined" && gpsloaded && elm == iprow){
+setstatus(elm, "muted");
+return;
+}
 		  		$("#temp").text(data.main.temp);
 		  		$("#pressure").text(data.main.pressure);
 		  		$("#humidity").text(data.main.humidity);
@@ -186,7 +192,8 @@ openweathermap.html?key=[api key here]
 		  		$("#pressure").text(data.main.pressure);
 		  		$("#location").text(data.name + ", " + data.sys.country);
 		  		$("#icon").removeClass().addClass("wi").addClass("wi-owm-"+(data.dt > data.sys.sunrise && data.dt < data.sys.sunset ? "day" : "night")+"-"+data.weather[0].id);
-		  		$("#weatherdesc").text(data.weather[0].description);
+		  		gpsloaded = true;
+	$("#weatherdesc").text(data.weather[0].description);
 		  		if(typeof(arg2) !== "undefined"){
 					setstatus(custominputrow, "muted");
 		  		}
@@ -217,7 +224,7 @@ openweathermap.html?key=[api key here]
 		gpsrow.find("i").show();
 		loadweather(custominputrow, $("#query").val());
 	}
-	function tryIP(){
+	function tryIP(start){
 		iprow.find("i").hide();
 		setstatus(iprow, "yellow");
 		$.ajax({
@@ -225,7 +232,11 @@ openweathermap.html?key=[api key here]
 			dataType: "json",
 			success: function(data){
 				var latlon = data.loc.split(',');
-			  	loadweather(iprow, latlon[0], latlon[1]);
+				if(!gpsloaded || typeof(start) === "undefined")
+				  	
+loadweather(iprow, latlon[0], latlon[1], start);
+				else
+					setstatus(iprow, "muted");
 			},
 			error: function(){
 				iprow.find("i").show();
@@ -233,7 +244,7 @@ openweathermap.html?key=[api key here]
 			}
 		});
 	}
-	tryIP();
+	tryIP(true);
 	if (navigator.geolocation) {
 		tryGPS();
 	}
