@@ -211,9 +211,7 @@ openweathermap.html?key=[api key here]
 		  	}
 		  });
 	}
-	if (navigator.geolocation) {
-		tryGPS();
-	}
+	
 	function customInput(){
 		iprow.find("i").show();
 		gpsrow.find("i").show();
@@ -236,4 +234,7 @@ openweathermap.html?key=[api key here]
 		});
 	}
 	tryIP();
+	if (navigator.geolocation) {
+		tryGPS();
+	}
 </script>
